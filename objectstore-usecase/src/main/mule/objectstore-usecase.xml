@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="5c64b615-34dd-481a-b8e2-7ebeb7c9dce6" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="7393d38e-7925-45d3-8d8e-57e778000029" entryTtl="15" expirationInterval="30" />
+	<flow name="objectstore-usecaseFlow" doc:id="530e26e8-05d5-404e-9a77-296e1b7b0ed1" >
+		<http:listener doc:name="Listener" doc:id="47686d98-98e8-46ad-b68e-c4d205ec4a20" config-ref="HTTP_Listener_config" path="/objectstore"/>
+		<logger level="INFO" doc:name="Start Logger" doc:id="466b28f1-03a9-4267-a514-c139171344b3" message="*************** #[payload]"/>
+		<os:store doc:name="Store" doc:id="4d9d0c1e-13d4-47da-bda2-dd06aa6d1386" key="EmployeeData" objectStore="Object_store">
+		</os:store>
+		<set-payload value='#["Data has been stored in Object Store"]' doc:name="Set Payload" doc:id="5abba38d-eae9-4851-9c0a-3f0758ec2d84" />
+	</flow>
+	<flow name="objectstore-usecaseFlow1" doc:id="f7330915-ee75-42e3-ab8b-733df254b960" >
+		<http:listener doc:name="Listener" doc:id="8fb8eabf-4bcd-4f26-bb89-bf43bc69dc51" config-ref="HTTP_Listener_config" path="/retrieve"/>
+		<os:retrieve doc:name="Retrieve" doc:id="e88be6ab-2510-49f2-aab5-1557d9f640c5" key="EmployeeData" objectStore="Object_store">
+			<os:default-value ><![CDATA[*****************************************]]></os:default-value>
+		</os:retrieve>
+		<logger level="INFO" doc:name="Logger" doc:id="ec44edf3-1130-4b4d-beaf-f9b866a5bfa3" message="*************** Retrieved Data from ObjectStore : #[payload]"/>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="06581c01-843e-44e4-9f6a-443fd204a773" />
+	</flow>
+</mule>
